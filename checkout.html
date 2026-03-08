@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>購入手続き — LUMIÈRE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #faf7f2; --warm-white: #fff9f4; --rose: #c4856a; --charcoal: #2a2220; --muted: #8a7b74; --border: #ede5dd; }
+    body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; display: flex; flex-direction: column; }
+
+    header { background: var(--warm-white); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; height: 72px; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 300; letter-spacing: 0.25em; color: var(--charcoal); text-decoration: none; }
+    .logo span { color: var(--rose); font-style: italic; }
+
+    /* STEPS */
+    .breadcrumb { display: flex; justify-content: center; align-items: center; padding: 2.5rem 1rem 0; }
+    .step { display: flex; flex-direction: column; align-items: center; gap: 0.45rem; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 500; border: 1.5px solid var(--border); background: var(--warm-white); color: var(--muted); }
+    .step.active .step-num { background: var(--rose); border-color: var(--rose); color: #fff; }
+    .step.done .step-num { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+    .step-label { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .step.active .step-label { color: var(--rose); font-weight: 500; }
+    .step.done .step-label { color: var(--charcoal); }
+    .step-line { width: 60px; height: 1px; background: var(--border); margin: 0 0.5rem 1.2rem; }
+    @media (min-width: 400px) { .step-line { width: 88px; } }
+
+    /* LAYOUT */
+    .checkout-wrap { max-width: 780px; width: 100%; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; flex: 1; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 300; margin-bottom: 0.3rem; }
+    .page-sub { font-size: 0.8rem; font-weight: 300; color: var(--muted); margin-bottom: 0.9rem; }
+    .demo-note { background: #fff8f0; border: 1px dashed #e8c5b0; border-radius: 2px; padding: 0.65rem 0.9rem; font-size: 0.7rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.4rem; }
+
+    .checkout-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (min-width: 620px) { .checkout-grid { grid-template-columns: 1fr 300px; } }
+
+    /* FORM */
+    .form-section { background: var(--warm-white); border: 1px solid var(--border); border-radius: 2px; padding: 1.4rem; margin-bottom: 1rem; }
+    .form-section h2 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 400; margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.28rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    input { background: var(--cream); border: 1px solid var(--border); border-radius: 1px; padding: 0.62rem 0.75rem; font-family: 'Jost', sans-serif; font-size: 0.83rem; color: var(--charcoal); outline: none; transition: border-color 0.2s; width: 100%; }
+    input:focus { border-color: var(--rose); }
+    input::placeholder { color: #ccc; }
+
+    /* ORDER SUMMARY */
+    .summary-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 2px; padding: 1.4rem; }
+    @media (min-width: 620px) { .summary-card { position: sticky; top: 90px; } }
+    .summary-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 400; margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+    .summary-item { display: flex; gap: 0.9rem; align-items: center; margin-bottom: 1rem; }
+    .summary-item svg { width: 58px; height: 58px; min-width: 58px; border-radius: 1px; }
+    .summary-item-info .name { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; }
+    .summary-item-info .id { font-size: 0.6rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+    .s-rows { border-top: 1px solid var(--border); padding-top: 0.85rem; }
+    .s-row { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.42rem; }
+    .s-row.total { padding-top: 0.6rem; border-top: 1px solid var(--border); color: var(--charcoal); font-weight: 500; margin-bottom: 0; }
+    .s-row.total .val { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 600; }
+
+    /* BUTTONS */
+    .btn-primary { display: block; width: 100%; background: var(--charcoal); color: var(--cream); border: none; padding: 1rem; font-family: 'Jost', sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; border-radius: 1px; text-align: center; transition: background 0.22s; margin-top: 1rem; }
+    .btn-primary:hover { background: var(--rose); }
+    .btn-secondary { display: block; width: 100%; background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 0.85rem; font-family: 'Jost', sans-serif; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; border-radius: 1px; text-align: center; transition: border-color 0.2s, color 0.2s; text-decoration: none; margin-top: 0.75rem; }
+    .btn-secondary:hover { border-color: var(--charcoal); color: var(--charcoal); }
+
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 1.8rem; font-size: 0.67rem; letter-spacing: 0.08em; color: var(--muted); }
+    @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <!-- GTM / TikTok Pixel ここに設置 -->
+
+  <header>
+    <a href="index.html" class="logo">LUMIÈRE<span>.</span></a>
+  </header>
+
+  <div class="breadcrumb">
+    <div class="step done"><div class="step-num">✓</div><span class="step-label">商品</span></div>
+    <div class="step-line"></div>
+    <div class="step done"><div class="step-num">✓</div><span class="step-label">カート</span></div>
+    <div class="step-line"></div>
+    <div class="step active"><div class="step-num">3</div><span class="step-label">購入手続き</span></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num">4</div><span class="step-label">完了</span></div>
+  </div>
+
+  <div class="checkout-wrap">
+    <h1 class="page-title">Checkout</h1>
+    <p class="page-sub">お届け先・お支払い情報を入力してください</p>
+    <p class="demo-note">📋 これはデモLPです。実際の購入・請求は発生しません。</p>
+
+    <div class="checkout-grid">
+      <!-- フォーム -->
+      <div>
+        <div class="form-section">
+          <h2>お届け先情報</h2>
+          <div class="form-row">
+            <div class="form-group"><label>姓</label><input type="text" placeholder="山田" /></div>
+            <div class="form-group"><label>名</label><input type="text" placeholder="花子" /></div>
+          </div>
+          <div class="form-row"><div class="form-group full"><label>郵便番号</label><input type="text" placeholder="000-0000" /></div></div>
+          <div class="form-row"><div class="form-group full"><label>住所</label><input type="text" placeholder="東京都渋谷区..." /></div></div>
+          <div class="form-row"><div class="form-group full"><label>メールアドレス</label><input type="email" placeholder="example@email.com" /></div></div>
+          <div class="form-row"><div class="form-group full"><label>電話番号</label><input type="tel" placeholder="090-0000-0000" /></div></div>
+        </div>
+        <div class="form-section">
+          <h2>お支払い情報</h2>
+          <div class="form-row"><div class="form-group full"><label>カード番号</label><input type="text" placeholder="4242 4242 4242 4242" maxlength="19" /></div></div>
+          <div class="form-row">
+            <div class="form-group"><label>有効期限</label><input type="text" placeholder="MM / YY" maxlength="7" /></div>
+            <div class="form-group"><label>セキュリティコード</label><input type="text" placeholder="CVV" maxlength="4" /></div>
+          </div>
+        </div>
+        <a href="cart.html" class="btn-secondary">← カートに戻る</a>
+      </div>
+
+      <!-- 注文サマリー -->
+      <div>
+        <div class="summary-card">
+          <h2>ご注文内容</h2>
+          <div id="summary-item"></div>
+          <div class="s-rows" id="summary-rows"></div>
+          <button class="btn-primary" id="confirm-btn">注文を確定する</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>&copy; 2025 LUMIÈRE Beauty — Demo LP for TikTok Pixel Verification</footer>
+
+  <script>
+    const SVG_THUMBS = {
+      serum001: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#fff8e1"/><circle cx="50" cy="44" r="28" fill="#fffde7" stroke="#f9a825" stroke-width="1.5"/><circle cx="50" cy="39" r="15" fill="#fff9c4" stroke="#ffe082" stroke-width="1"/><text x="50" y="44" text-anchor="middle" font-family="serif" font-size="13" fill="#e65100" font-style="italic">C</text><rect x="40" y="66" width="20" height="6" rx="2" fill="#f9a825"/><rect x="43" y="57" width="14" height="12" rx="3" fill="#fffde7" stroke="#f9a825" stroke-width="1"/><ellipse cx="34" cy="74" rx="5" ry="7" fill="#ffee58" opacity="0.5"/><ellipse cx="67" cy="69" rx="4" ry="5" fill="#ffca28" opacity="0.45"/></svg>`,
+      cream002: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#ede7f6"/><ellipse cx="50" cy="74" rx="30" ry="7" fill="#9575cd" opacity="0.25"/><rect x="20" y="44" width="60" height="34" rx="5" fill="#ede7f6" stroke="#7e57c2" stroke-width="1.5"/><ellipse cx="50" cy="44" rx="30" ry="8" fill="#7e57c2"/><ellipse cx="50" cy="42" rx="24" ry="6" fill="#9575cd"/><rect x="28" y="50" width="44" height="22" rx="2" fill="white" opacity="0.5"/><text x="50" y="62" text-anchor="middle" font-family="serif" font-size="8" fill="#4527a0" font-style="italic">Retinol</text><text x="50" y="72" text-anchor="middle" font-family="serif" font-size="6" fill="#311b92">Night Cream</text><text x="26" y="34" font-size="13" fill="#7e57c2" opacity="0.8">☽</text><text x="66" y="25" font-size="8" fill="#ce93d8">★</text></svg>`,
+      lotion003: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#e0f7fa"/><rect x="36" y="22" width="28" height="62" rx="8" fill="#e0f7fa" stroke="#00acc1" stroke-width="1.5"/><rect x="45" y="10" width="10" height="16" rx="3" fill="#00acc1"/><rect x="40" y="8" width="20" height="6" rx="3" fill="#00bcd4"/><circle cx="50" cy="45" r="11" fill="white" opacity="0.55"/><text x="50" y="49" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#006064" font-weight="bold">HA</text><text x="50" y="65" text-anchor="middle" font-family="serif" font-size="5.5" fill="#004d40">Lotion</text><ellipse cx="27" cy="55" rx="5" ry="7" fill="#4dd0e1" opacity="0.4"/><ellipse cx="74" cy="48" rx="4" ry="6" fill="#80deea" opacity="0.4"/></svg>`
+    };
+
+    // ── TikTok Pixel / GTM ── InitiateCheckout（購入手続きページ）
+    // ttq.track('InitiateCheckout', { ... });
+
+    const raw = localStorage.getItem('lumiere_cart');
+    if (raw) {
+      const item = JSON.parse(raw);
+
+      document.getElementById('summary-item').innerHTML = `
+        <div class="summary-item">
+          ${SVG_THUMBS[item.content_id] || ''}
+          <div class="summary-item-info">
+            <p class="id">${item.content_id}</p>
+            <p class="name">${item.product_name}</p>
+          </div>
+        </div>`;
+
+      document.getElementById('summary-rows').innerHTML = `
+        <div class="s-row"><span>小計</span><span>¥${item.price.toLocaleString()}</span></div>
+        <div class="s-row"><span>送料</span><span>無料</span></div>
+        <div class="s-row total"><span>合計（税込）</span><span class="val">¥${item.price.toLocaleString()}</span></div>`;
+
+      document.getElementById('confirm-btn').addEventListener('click', () => {
+        // ── TikTok Pixel / GTM ── AddPaymentInfo（注文確定ボタン押下）
+        // ttq.track('AddPaymentInfo', {
+        //   content_id:   item.content_id,
+        //   content_name: item.product_name,
+        //   value:        item.price,
+        //   currency:     'JPY'
+        // });
+        window.location.href = 'thanks.html';
+      });
+    }
+  </script>
+</body>
+</html>
